@@ -25,6 +25,7 @@ router.get('/getAllUser',FriendController.getAllUser);
 router.post('/FriendRequest',userToken,FriendController.friendRequest);
 router.get('/Inbox',userToken,FriendController.inbox)
 router.post('/RequestProcess',userToken,FriendController.requestProcess)
+router.get('/GetFriends',userToken,FriendController.getFriends);
 
 
 module.exports=router;

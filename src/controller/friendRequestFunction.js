@@ -3,6 +3,7 @@ const Inbox = require("../model/inboxModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const express = require("express");
+const userModel = require("../model/userModel");
 
 class FriendController {
 
@@ -116,6 +117,24 @@ class FriendController {
         }
     }
 
+
+    async getFriends(req, res) {
+        try {
+            const id = req.id
+            const list = await User.findById(id)
+            if(!list) return res.send({message:"Invalid User Id"})
+            const friendList = list.friends
+            let allFriends = [];
+            for (const friend of friendList){
+                const data = await User.findById(friend);
+                allFriends.push(data.name,data._id)
+            }
+            res.send({message:"Friend List",allFriends})
+        } catch (err) {
+            console.error(err)
+            return res.send(err)
+        }
+    }
 
 }
 
