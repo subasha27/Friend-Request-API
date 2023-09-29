@@ -3,24 +3,19 @@ const express = require("express");
 const router = express.Router();
 const userController = require("../controller/userFunction");
 const FriendController = require("../controller/friendRequestFunction")
-const verifyToken = require("../middleware/PasswordResetMiddleware");
 const userToken = require("../middleware/UserAuthmiddleware");
 
-
-//crud
+//account creation
 router.post('/signup', userController.signUp);
-router.put('/createIt/:id',userController.updateUser);
-router.delete('/createIt/:id',userController.deleteUser);
-router.get('/getIt/:id',userController.getUser);
-router.get('/getAll',userController.getAllUser);
 
 //login
-router.post('/UserLogin',userController.userSign);
+router.post('/UserLog',FriendController.userSign);
+
+//password change
 router.post('/UserPassReset',userController.passRequest);
-router.post(`/PassChange`,verifyToken,userController.passChange);
+router.post(`/PassChange`,userToken,userController.passChange);
 
 //friend Request
-router.post('/UserLog',FriendController.userSign);
 router.get('/getAllUser',FriendController.getAllUser);
 router.post('/FriendRequest',userToken,FriendController.friendRequest);
 router.get('/Inbox',userToken,FriendController.inbox)

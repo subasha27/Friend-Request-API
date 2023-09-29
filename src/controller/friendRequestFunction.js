@@ -3,6 +3,7 @@ const Inbox = require("../model/inboxModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const express = require("express");
+const mongoose = require("mongoose");
 const userModel = require("../model/userModel");
 
 class FriendController {
@@ -49,18 +50,18 @@ class FriendController {
         try {
             const sendId = req.body.sendId;
             const { id } = req
-            
+
             const userName = await User.findById(id)
 
             const userFind = await User.findById(sendId);
             if (!userFind) return res.send({ message: "User not exists" })
-            
+
             const existingRequest = await Inbox.findOne({ My_id: id, sendId: sendId })
             if (existingRequest) return res.send({ message: "Request already sent to this user" })
 
 
             const alreadyFriends = await User.findById(id)
-          
+
             if (alreadyFriends.friends.includes(sendId)) return res.send({ message: "You are already friends with the user" })
             else {
 
@@ -93,14 +94,16 @@ class FriendController {
             const { sendId, Accept } = req.body
             const id = req.id
             const existingRequest = await Inbox.findOne({ My_id: sendId, sendId: id });
-            
+
             if (!existingRequest) return res.send({ message: "No Request Found" });
             if (Accept == 'true') {
+                const sendIdObjectId = new mongoose.Types.ObjectId(sendId);
+                const idObjectId = new mongoose.Types.ObjectId(id);
                 const name = await User.findById(sendId);
                 const accept = await User.findById(id)
-                accept.friends.push(sendId)
+                accept.friends.push(sendIdObjectId)
                 const sender = await User.findById(sendId)
-                sender.friends.push(id)
+                sender.friends.push(idObjectId)
 
                 await accept.save()
                 await sender.save()
@@ -122,14 +125,10 @@ class FriendController {
         try {
             const id = req.id
             const list = await User.findById(id)
-            if(!list) return res.send({message:"Invalid User Id"})
-            const friendList = list.friends
-            let allFriends = [];
-            for (const friend of friendList){
-                const data = await User.findById(friend);
-                allFriends.push(data.name,data._id)
-            }
-            res.send({message:"Friend List",allFriends})
+            if (!list) return res.send({ message: "Invalid User Id" })
+            const firendList = list.friends;
+            const friends = await User.find({ _id: { $in: firendList } }).select("name _id");
+            res.send({ message: "Friend List", friends })
         } catch (err) {
             console.error(err)
             return res.send(err)

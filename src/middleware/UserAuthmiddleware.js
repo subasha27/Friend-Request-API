@@ -4,8 +4,7 @@ const signToken = process.env.signToken;
 
 
 function authenticateToken(req, res, next) {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
-
+    const token = req.header('Authorization')?.replace('Bearer ', '')||req.query.token;
     if (!token) return res.status(401).json({ message: 'Authorization token not found' });
 
     try {
